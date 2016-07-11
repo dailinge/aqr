@@ -29,15 +29,6 @@ object PositionService {
   private[this] def totalValue(): Float =
     (kvStore.map { case (k, h) => h.price * h.shares.toFloat }).sum + cash
 
-  private[this] def parseMessage(message: String): Event = message match {
-    case FillRegex(symbol, price, shares, action) =>
-      Fill(symbol, price.toFloat, shares.toInt, action)
-    case PriceRegex(timestamp, symbol, price) =>
-      PriceUpdate(timestamp, symbol, price.toFloat)
-    case _ =>
-      throw new RuntimeException("invalid message format")
-  }
-
   private[this] def formatPNLMessage(
     timestamp: String,
     symbol: String,
