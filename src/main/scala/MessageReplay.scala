@@ -7,8 +7,18 @@ object MessageReplay {
   val extractTimestamp = """[P|F] (\d+) .*""".r
 }
 
+/**
+ * A wrapper that iterates through the fills and price update messages
+ * provided by two separate files. This wrapper interleaves the two types
+ * of messages to maintain chronological order of all the messages, assuming
+ * the messages in each file are already in chronological order.
+ *
+ * @param fillsFile path to the file that specifies fills messages
+ * @param pricesFile path to the file that specifies price update messages
+ */
 class MessageReplay(fillsFile: String, pricesFile: String) {
   import MessageReplay._
+
   val fills: BufferedIterator[String] = Source.fromFile(fillsFile).getLines.buffered
   val prices: BufferedIterator[String] = Source.fromFile(pricesFile).getLines.buffered
 
@@ -17,7 +27,6 @@ class MessageReplay(fillsFile: String, pricesFile: String) {
   def next(): String =
     (Try(fills.head), Try(prices.head)) match {
       case (Success(fill), Success(price)) =>
-
         (fill, price) match {
           case (extractTimestamp(fillTime), extractTimestamp(priceTime)) =>
             if (fillTime < priceTime) {
