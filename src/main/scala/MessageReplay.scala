@@ -8,7 +8,7 @@ object MessageReplay {
 }
 
 /**
- * A wrapper that iterates through the fills and price update messages
+ * A wrapper that iterates through the fill and price update messages
  * provided by two separate files. This wrapper interleaves the two types
  * of messages to maintain chronological order of all the messages, assuming
  * the messages in each file are already in chronological order.
@@ -24,6 +24,10 @@ class MessageReplay(fillsFile: String, pricesFile: String) {
 
   def hasNext(): Boolean = fills.hasNext || prices.hasNext
 
+  /**
+   * Generates the next message. A price update message gets generated before
+   * a fill one if they have the same timestamp.
+   */
   def next(): String =
     (Try(fills.head), Try(prices.head)) match {
       case (Success(fill), Success(price)) =>
