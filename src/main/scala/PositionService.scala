@@ -3,6 +3,10 @@ package aqr
 import scala.collection.mutable
 import scala.util.{Failure, Try}
 
+/**
+ * Provides an in-memory Position Service, which processes fill and price update messages
+ * and keeps track of the P&L.
+ */
 object PositionService {
   import Event._
 
@@ -12,11 +16,13 @@ object PositionService {
   val kvStore: mutable.HashMap[String, PLRecord] = mutable.HashMap.empty[String, PLRecord]
   var cash: Float = 0.0.toFloat
 
+  /** Initialize the service to the default state and should be called when the service starts. */
   def init(): Unit = {
     kvStore.clear()
     cash = 0.0.toFloat
   }
 
+  /** The main service interface to receive fill or price update messages. */
   def receiveMessage(message: String): Unit = {
     Try(parseMessage(message)) flatMap { event =>
       Try(processEvent(event))

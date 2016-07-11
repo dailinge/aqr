@@ -1,5 +1,9 @@
 package aqr
 
+/**
+ * Simulates the workflow of generating fill and price update messages
+ * and sending them to the Position Service.
+ */
 object Simulator extends App {
   case class Config(fillsFile: String = "", pricesFile: String = "")
 
@@ -23,6 +27,7 @@ object Simulator extends App {
   val messageReplay = new MessageReplay(config.fillsFile, config.pricesFile)
 
   PositionService.init()
+
   while(messageReplay.hasNext) {
     PositionService.receiveMessage(messageReplay.next)
   }
